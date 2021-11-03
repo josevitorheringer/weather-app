@@ -7,11 +7,17 @@ function api(input) {
       return responseStream.json();
     })
     .then((data) => {
-      init(data);
+      if (data.length > 0) init(data);
+      else {
+        throw new Error("Cidade não encontrada");
+      }
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
-function getCurrentWeather(city) {
-  var key = city.getAttribute("data-key");
+function getCurrentWeather(event) {
+  var key = event.target.getAttribute("data-key");
   fetch(
     `http://dataservice.accuweather.com/currentconditions/v1/${key}?apikey=${apiKey}&language=en-us`
   )
@@ -31,15 +37,10 @@ function buildCurrentWeather(data) {
 function buildSearchResults(data) {
   const results = document.getElementById("searchResults");
   const p = document.createElement("p");
-  p.textContent =
-    data.LocalizedName +
-    " - " +
-    data.AdministrativeArea.ID +
-    ", " +
-    data.Country.LocalizedName;
+  p.textContent = `${data.LocalizedName} - ${data.AdministrativeArea.ID}, ${data.Country.LocalizedName}`;
   results.appendChild(p);
   p.setAttribute("data-key", data.Key);
-  p.setAttribute("onclick", "getCurrentWeather(this)");
+  p.addEventListener("click", getCurrentWeather);
 }
 
 function clearSearchResults() {
