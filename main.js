@@ -79,7 +79,7 @@ function init(data) {
   }
 }
 
-function search() {
-  let input = document.getElementById("pesquisa").value;
+function searchCity() {
+  let input = document.getElementById("searchForm").value;
   apiLocationAutocomplete(input);
 }
