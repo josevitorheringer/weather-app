@@ -1,5 +1,8 @@
+//----------------------API CONTENT----------------------//
+
 const apiKey = "58GXGmNAqmcUAVgnRgFJC0FG3LqpbumY";
-function api(input) {
+
+function apiLocationAutocomplete(input) {
   fetch(
     `http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=${apiKey}&q=${input}`
   )
@@ -16,6 +19,14 @@ function api(input) {
       console.log(err);
     });
 }
+
+async function apiLocationKey(key) {
+  let response = await fetch(
+    `http://dataservice.accuweather.com/locations/v1/${key}?apikey=${apiKey}`
+  );
+  return await response.json();
+}
+
 function getCurrentWeather(event) {
   var key = event.target.getAttribute("data-key");
   fetch(
@@ -25,13 +36,28 @@ function getCurrentWeather(event) {
       return responseStream.json();
     })
     .then((data) => {
-      buildCurrentWeather(data);
+      buildCurrentWeather(data[0], key);
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
+//----------------------BUILD PAGE----------------------//
+function clearSearchResults() {
+  const results = document.getElementById("searchResults");
+  results.innerHTML = "";
+}
 
-function buildCurrentWeather(data) {
-  console.log(data);
+function buildCurrentWeather(data, key) {
   clearSearchResults();
+  apiLocationKey(key).then((city) => {
+    console.log(city);
+    const results = document.getElementById("searchResults");
+    const p = document.createElement("p");
+    p.textContent = `Está fazendo ${data.Temperature.Metric.Value}\u00B0${data.Temperature.Metric.Unit} em ${city.LocalizedName}`;
+    console.log(data);
+    results.appendChild(p);
+  });
 }
 
 function buildSearchResults(data) {
@@ -43,10 +69,7 @@ function buildSearchResults(data) {
   p.addEventListener("click", getCurrentWeather);
 }
 
-function clearSearchResults() {
-  const results = document.getElementById("searchResults");
-  results.innerHTML = "";
-}
+//----------------------CONTROL----------------------//
 
 function init(data) {
   clearSearchResults();
@@ -58,5 +81,5 @@ function init(data) {
 
 function search() {
   let input = document.getElementById("pesquisa").value;
-  api(input);
+  apiLocationAutocomplete(input);
 }
