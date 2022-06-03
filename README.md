@@ -1,1 +1,1 @@
-# weather-app builded with javacript
+weather-app builded with javacript
